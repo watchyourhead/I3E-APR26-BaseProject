@@ -8,7 +8,18 @@ public class CollectibleScript : MonoBehaviour
 
     void Start()
     {
-        collectibleAudio = GetComponent<AudioSource>(); // Get the AudioSource component attached to this GameObject so we can play a sound when collected
+        collectibleAudio = GetComponent<AudioSource>();
     }
 
+    public void Collect() // Custom method to handle the collection of this item, called from the PlayerScript when the player interacts with it
+    {
+        if(collectibleAudio != null) // Check if we have an AudioSource component to play a sound
+        {
+            collectibleAudio.Play(); // Play the collection sound effect for feedback when the item is collected
+        }
+        else
+        {
+            print("Warning: No AudioSource found on " + gameObject.name); // Log a warning if there is no audio component, but still allow collection to proceed
+        }
+    }
 }

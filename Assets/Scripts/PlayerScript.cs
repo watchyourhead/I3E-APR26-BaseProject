@@ -4,8 +4,9 @@ using TMPro; // Import TextMeshPro namespace for advanced text handling (not use
 
 public class PlayerScript : MonoBehaviour
 {
+    CollectibleScript currentCollectible; // Store the collectible object the player is currently able to interact with
 
-    GameObject currentCollectible; // Store the collectible object the player is currently able to interact with
+    DoorScript currentDoor; // Store the door object the player is currently able to interact with
 
     int playerScore = 0; // Keep track of how many points the player has collected so far
 
@@ -24,29 +25,43 @@ public class PlayerScript : MonoBehaviour
     {
         if(currentCollectible != null) // Only collect something if the player is currently near a collectible
         {
-            CollectibleScript collScript = currentCollectible.GetComponentInParent<CollectibleScript>(); // Find the collectible script on the collectible object or its parents
-            if(collScript == null) // Check if the collectible script was found successfully
-            {
-                print("Error: No CollectibleScript found on " + currentCollectible.name); // Log an error in the Unity Console if the collectible is missing its data component
-                return; // Exit the method early because we cannot safely collect the item without the script
-            }
-            else
-            {
-                playerScore += collScript.collectibleScore; // Add the collectible's score value to the player's total score
+                playerScore += currentCollectible.collectibleScore; // Add the collectible's score value to the player's total score
                 print("Player has collected " + playerScore + " points"); // Print the updated score to the console for debugging or feedback
                 scoreText.text = "Score: " + playerScore; // Update the on-screen score display to reflect the new score after collecting an item
-                Destroy(currentCollectible); // Remove the collectible object from the scene after it has been collected
-                currentCollectible = null; // Clear the reference so the player no longer has an active collectible selected
-            }
+                currentCollectible.Collect(); // Call the Collect method on the collectible script to handle its collection logic
+                currentCollectible = null; // Clear the reference so the player no longer has an active collectible selected 
         }
+        else
+        {
+                print("Error: No CollectibleScript found on " + currentCollectible.name); // Log an error in the Unity Console if the collectible is missing its data component
+                return; // Exit the method early because we cannot safely collect the item without the script
+        }
+        // if(currentDoor != null) // Only interact with a door if the player is currently near one
+        // {
+        //     DoorScript doorScript = currentDoor.GetComponentInParent<DoorScript>(); // Find the door script on the door object or its parents
+        //     if(doorScript == null) // Check if the door script was found successfully
+        //     {
+        //         print("Error: No DoorScript found on " + currentDoor.name); // Log an error in the Unity Console if the door is missing its data component
+        //         return; // Exit the method early because we cannot safely interact with the door without the script
+        //     }
+        //     else
+        //     {
+        //         doorScript.Interact(); // Call the Interact method on the door script to handle its interaction logic            
+        //     }
+        // }
     }
 
     void OnTriggerEnter(Collider other) // Unity event called when another collider enters this GameObject's trigger collider
     {
         if(other.gameObject.tag == "Collectible") // Check if the object entering the trigger is tagged as a collectible
         {
-            currentCollectible = other.GetComponentInParent<CollectibleScript>().gameObject; // Store the collectible GameObject so the player can interact with it later
+            currentCollectible = other.GetComponentInParent<CollectibleScript>(); // Store the collectible script so the player can interact with it later
         }
+
+        // if(other.gameObject.tag == "Door") // Check if the object entering the trigger is tagged as a door
+        // {
+        //     currentDoor = other.GetComponentInParent<DoorScript>(); // Store the door script so the player can interact with it later
+        // }
 
         if(other.gameObject.tag == "GoalArea" && playerScore >= targetScore) // Check if the player entered the goal area and has enough points
         {
@@ -59,6 +74,11 @@ public class PlayerScript : MonoBehaviour
         if(other.gameObject == currentCollectible) // If the collectible leaving the trigger is the one we were tracking
         {
             currentCollectible = null; // Clear the current collectible because it is no longer in range
+        }
+
+        if(other.gameObject == currentDoor) // If the door leaving the trigger is the one we were tracking
+        {
+            currentDoor = null; // Clear the current door because it is no longer in range
         }
     }
 

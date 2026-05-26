@@ -9,6 +9,7 @@ TagManager:
   - GoalArea
   - Hazards
   - SomeTag
+  - Door
   layers:
   - Default
   - TransparentFX
