@@ -6,8 +6,6 @@ public class PlayerScript : MonoBehaviour
 {
     CollectibleScript currentCollectible; // Store the collectible object the player is currently able to interact with
 
-    DoorScript currentDoor; // Store the door object the player is currently able to interact with
-
     int playerScore = 0; // Keep track of how many points the player has collected so far
 
     [SerializeField]
@@ -26,7 +24,6 @@ public class PlayerScript : MonoBehaviour
         if(currentCollectible != null) // Only collect something if the player is currently near a collectible
         {
             playerScore += currentCollectible.collectibleScore; // Add the collectible's score value to the player's total score
-            print("Player has collected " + playerScore + " points"); // Print the updated score to the console for debugging or feedback
             scoreText.text = "Score: " + playerScore; // Update the on-screen score display to reflect the new score after collecting an item
             currentCollectible.Collect(); // Call the Collect method on the collectible script to handle its collection logic
             currentCollectible = null; // Clear the reference so the player no longer has an active collectible selected 
@@ -36,16 +33,6 @@ public class PlayerScript : MonoBehaviour
             print("Error: No CollectibleScript found"); // Log an error in the Unity Console if the collectible is missing its data component
             //return; // Exit the method early because we cannot safely collect the item without the script
         }
-
-        if(currentDoor != null) // Only interact with a door if the player is currently near one
-        {
-            currentDoor.Interact(); // Call the Interact method on the door script to handle its interaction logic            
-        }
-        else
-        {
-            print("Error: No DoorScript found"); // Log an error in the Unity Console if the door is missing its data component
-            //return;
-        }
     }
 
     void OnTriggerEnter(Collider other) // Unity event called when another collider enters this GameObject's trigger collider
@@ -53,11 +40,6 @@ public class PlayerScript : MonoBehaviour
         if(other.gameObject.tag == "Collectible") // Check if the object entering the trigger is tagged as a collectible
         {
             currentCollectible = other.GetComponentInParent<CollectibleScript>(); // Store the collectible script so the player can interact with it later
-        }
-
-        if(other.gameObject.tag == "Door") // Check if the object entering the trigger is tagged as a door
-        {
-            currentDoor = other.GetComponentInParent<DoorScript>(); // Store the door script so the player can interact with it later
         }
 
         if(other.gameObject.tag == "GoalArea" && playerScore >= targetScore) // Check if the player entered the goal area and has enough points
@@ -71,11 +53,6 @@ public class PlayerScript : MonoBehaviour
         if(other.gameObject == currentCollectible) // If the collectible leaving the trigger is the one we were tracking
         {
             currentCollectible = null; // Clear the current collectible because it is no longer in range
-        }
-
-        if(other.gameObject == currentDoor) // If the door leaving the trigger is the one we were tracking
-        {
-            currentDoor = null; // Clear the current door because it is no longer in range
         }
     }
 
